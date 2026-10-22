@@ -28,7 +28,7 @@ const RESERVED_SLUGS = new Set([
 ]);
 
 export const DEFAULT_OPTIONS: FormOptions = {
-  transparentBackground: true,
+  transparentBackground: false,
   trackEvents: false,
   hideTitle: false,
   alignLeft: false,

@@ -63,10 +63,11 @@ export function buildEmbedCode(form: FormRecord): string {
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="color-scheme" content="only light" />
 <title>${title}</title>
 <script async src="https://tally.so/widgets/embed.js"></script>
 <style type="text/css">
-html { margin: 0; height: 100%; }
+html { margin: 0; height: 100%; background: #f3f3f3; }
 body { margin: 0; height: 100%; display: flex; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f3f3f3; }
 button { padding: 12px 24px; font-size: 15px; font-weight: 500; color: #fff; background: #000; border: 0; border-radius: 8px; cursor: pointer; }
 </style>
@@ -87,10 +88,11 @@ window.addEventListener('load', function () { openForm(); });
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="color-scheme" content="only light" />
 <title>${title}</title>
 <script async src="https://tally.so/widgets/embed.js"></script>
 <style type="text/css">
-html { margin: 0; }
+html { margin: 0; background: #fff; }
 body { margin: 0; padding: 24px;${o.transparentBackground ? '' : ' background: #fff;'} }
 .wrap { max-width: 700px; margin: 0 auto; }
 </style>
@@ -107,10 +109,11 @@ body { margin: 0; padding: 24px;${o.transparentBackground ? '' : ' background: #
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="color-scheme" content="only light" />
 <title>${title}</title>
 <script async src="https://tally.so/widgets/embed.js"></script>
 <style type="text/css">
-html { margin: 0; height: 100%; overflow: hidden; }
+html { margin: 0; height: 100%; overflow: hidden; background: #fff; }
 iframe { position: absolute; top: 0; right: 0; bottom: 0; left: 0; border: 0; }
 </style>
 </head>

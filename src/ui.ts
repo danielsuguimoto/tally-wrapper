@@ -204,7 +204,7 @@ export function editorPage(
           <strong style="font-size:13px;">Options</strong>
           <span style="font-size:11px;color:#999;">ⓘ Help</span>
         </div>
-        ${toggle('transparentBackground', 'Transparent background', checked(o?.transparentBackground, true))}
+        ${toggle('transparentBackground', 'Transparent background', checked(o?.transparentBackground, false))}
         ${toggle('trackEvents', 'Track form events', checked(o?.trackEvents, false))}
         <div id="opts-standard" style="display:none;margin-top:6px;border-top:1px solid #f0f0f0;padding-top:6px;">
           <div style="font-size:11px;color:#999;margin-bottom:2px;">Standard options</div>

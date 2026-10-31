@@ -1,5 +1,6 @@
 import { Hono, type Context } from 'hono';
-import OAuthProvider from '@cloudflare/workers-oauth-provider';
+import { CimdFetchError } from '@cloudflare/workers-oauth-provider';
+import { clientMetadataUnavailable, fetchOAuth } from './oauth';
 import type { Env, FormRecord } from './types';
 import { TallyMCP } from './mcp';
 import {
@@ -30,7 +31,8 @@ app.get('/authorize', async (c) => {
   let authReq;
   try {
     authReq = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
-  } catch {
+  } catch (error) {
+    if (error instanceof CimdFetchError) return clientMetadataUnavailable();
     return c.text('Invalid authorization request', 400);
   }
   return c.html(authorizePage(c.req.url, authReq.clientId));
@@ -40,7 +42,8 @@ app.post('/authorize', async (c) => {
   let authReq;
   try {
     authReq = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
-  } catch {
+  } catch (error) {
+    if (error instanceof CimdFetchError) return clientMetadataUnavailable();
     return c.text('Invalid authorization request', 400);
   }
   const body = await c.req.parseBody();
@@ -48,14 +51,19 @@ app.post('/authorize', async (c) => {
   if (!(await verifyPassword(password, c.env.ADMIN_PASSWORD))) {
     return c.html(authorizePage(c.req.url, authReq.clientId, 'Wrong password'), 401);
   }
-  const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
-    request: authReq,
-    userId: 'admin',
-    metadata: { label: 'Admin' },
-    scope: authReq.scope,
-    props: { userId: 'admin', origin: new URL(c.req.url).origin },
-  });
-  return c.redirect(redirectTo, 302);
+  try {
+    const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
+      request: authReq,
+      userId: 'admin',
+      metadata: { label: 'Admin' },
+      scope: authReq.scope,
+      props: { userId: 'admin', origin: new URL(c.req.url).origin },
+    });
+    return c.redirect(redirectTo, 302);
+  } catch (error) {
+    if (error instanceof CimdFetchError) return clientMetadataUnavailable();
+    throw error;
+  }
 });
 
 app.get('/admin/login', async (c) => {
@@ -211,17 +219,18 @@ const mcpHandler = TallyMCP.serve('/mcp');
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const origin = new URL(request.url).origin;
-    return new OAuthProvider<Env>({
+    return fetchOAuth(request, env, ctx, {
       apiRoute: '/mcp',
       apiHandler: mcpHandler,
       defaultHandler: app,
       authorizeEndpoint: '/authorize',
       tokenEndpoint: '/token',
       clientRegistrationEndpoint: '/register',
+      clientIdMetadataDocumentEnabled: true,
       resourceMetadata: {
         resource: `${origin}/mcp`,
         authorization_servers: [origin],
       },
-    }).fetch(request, env, ctx);
+    });
   },
 } satisfies ExportedHandler<Env>;
